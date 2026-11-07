@@ -1,0 +1,17 @@
+"sample","patient","tissue","n_cells","mac_like","LYVE1_in_mac_like","LYVE1_total","CCL19_total"
+"sample1",1,"Endometrioma",1171,18,0,1,0
+"sample12",7,"Endometrioma",11999,692,79,191,8
+"sample15",8,"Endometrioma",4224,646,190,254,9
+"sample21",9,"Endometrioma",9948,1020,204,276,12
+"sample24",10,"Eutopic",5621,611,3,6,13
+"sample29",11,"Endometrioma",27369,2056,192,438,101
+"sample33",14,"Endometriosis (ovary)",16747,329,7,44,1
+"sample35",14,"Eutopic",10367,320,18,61,40
+"sample38",16,"Eutopic",13793,271,3,18,110
+"sample40",18,"Eutopic",11804,123,4,69,252
+"sample42",19,"Endometrioma",8415,125,3,59,100
+"sample44",20,"Endometriosis",2249,19,0,0,1
+"sample45",21,"Endometriosis",795,21,0,0,0
+"sample46",21,"Endometriosis",3040,23,0,2,0
+"sample5",4,"Endometriosis",2868,375,4,7,23
+"sample8",6,"Eutopic",12186,703,7,87,25

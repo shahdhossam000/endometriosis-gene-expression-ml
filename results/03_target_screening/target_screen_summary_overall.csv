@@ -1,0 +1,7 @@
+gene,group,usable_patients,total_cells,expr_cells,pooled_pct_expr
+CCL19,All mural,7,2537,495,19.5
+CCL19,All stromal,7,37564,569,1.5
+CCL19,Prv-CCL19,7,2159,478,22.1
+LYVE1,All macrophages,10,4762,1431,30.1
+LYVE1,All myeloid,10,11504,1753,15.2
+LYVE1,Mac-LYVE1,4,1289,718,55.7

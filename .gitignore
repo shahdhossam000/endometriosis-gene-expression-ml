@@ -1,0 +1,21 @@
+# R / RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# data and large intermediate files (GitHub refuses files over 100 MB)
+data/
+results/01_processing/
+results/02_annotation/
+results/04_ml_export/
+*.rds
+*.mtx
+*.h5
+*.tar
+*.tar.gz
+*.zip
+
+# Python
+__pycache__/
+.ipynb_checkpoints/

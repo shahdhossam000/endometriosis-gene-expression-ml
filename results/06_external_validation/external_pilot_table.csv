@@ -1,0 +1,10 @@
+"sample","patient","tissue","n_genes","n_cells","CD68","C1QA","FOLR2","MRC1","LYVE1","LYVE1_in_CD68","CCL19"
+"sample1",1,"Endometrioma",33538,1171,13,5,2,5,1,0,0
+"sample24",10,"Eutopic",33538,5621,578,42,64,23,6,3,13
+"sample38",16,"Eutopic",36601,13793,216,90,13,73,18,1,110
+"sample40",18,"Eutopic",36601,11804,106,23,3,253,69,3,252
+"sample44",20,"Endometriosis",36601,2249,16,4,0,6,0,0,1
+"sample45",21,"Endometriosis",36601,795,18,1,2,1,0,0,0
+"sample46",21,"Endometriosis",36601,3040,18,4,1,6,2,0,0
+"sample5",4,"Endometriosis",33538,2868,311,177,32,124,7,4,23
+"sample8",6,"Eutopic",33538,12186,511,235,70,157,87,5,25

@@ -1,0 +1,31 @@
+gene,group,tissue,usable_patients,total_cells,expr_cells
+CCL19,All mural,Ctrl,1,419,13
+CCL19,All mural,EcO,0,359,2
+CCL19,All mural,EcP,3,495,186
+CCL19,All mural,EcPA,5,710,279
+CCL19,All mural,EuE,0,554,15
+CCL19,All stromal,Ctrl,1,2445,15
+CCL19,All stromal,EcO,0,15288,6
+CCL19,All stromal,EcP,5,6723,224
+CCL19,All stromal,EcPA,5,2780,298
+CCL19,All stromal,EuE,0,10328,26
+CCL19,Prv-CCL19,Ctrl,1,415,13
+CCL19,Prv-CCL19,EcO,0,180,2
+CCL19,Prv-CCL19,EcP,3,428,180
+CCL19,Prv-CCL19,EcPA,5,593,268
+CCL19,Prv-CCL19,EuE,0,543,15
+LYVE1,All macrophages,Ctrl,0,315,12
+LYVE1,All macrophages,EcO,4,1038,426
+LYVE1,All macrophages,EcP,8,1362,408
+LYVE1,All macrophages,EcPA,3,970,494
+LYVE1,All macrophages,EuE,4,1077,91
+LYVE1,All myeloid,Ctrl,0,1078,16
+LYVE1,All myeloid,EcO,4,1386,464
+LYVE1,All myeloid,EcP,8,4386,498
+LYVE1,All myeloid,EcPA,6,2148,676
+LYVE1,All myeloid,EuE,5,2506,99
+LYVE1,Mac-LYVE1,Ctrl,0,38,10
+LYVE1,Mac-LYVE1,EcO,2,594,300
+LYVE1,Mac-LYVE1,EcP,1,256,201
+LYVE1,Mac-LYVE1,EcPA,2,256,162
+LYVE1,Mac-LYVE1,EuE,0,145,45
