@@ -155,6 +155,30 @@ All seven patients are above the baseline. C02 is the only control and has just 
 The AUC is computed on all cells of the group, so part of it reflects membership of the expression-rich subtype.
 The Spearman among expressing cells may partly reflect raw counts and cell depth; this was not tested.
 
+### ROC and precision-recall curves (requested by the supervisor)
+
+The models predict a value, so to draw these curves the task is turned into a classification: a cell is "expressing" if its count of
+the target gene is above zero, and the predicted expression is the score (no threshold needed). Curves pool the test patients
+(`figures/fig5_roc_curves.png`, `figures/fig6_precision_recall_curves.png`; tables `results/05_ml_results/roc_pr_pooled_summary.csv` and
+`roc_pr_per_patient.csv`).
+
+| Analysis | Cells (patients) | Expressing | Model | ROC AUC | Average precision | Baseline AUC / AP |
+|---|---|---|---|---|---|---|
+| LYVE1 internal | 4,416 (10) | 32% | Elastic Net | 0.833 | 0.715 | 0.529 / 0.397 (subtype mean) |
+| | | | XGBoost | 0.839 | 0.722 | |
+| CCL19 internal | 1,802 (7) | 27% | Elastic Net | 0.920 | 0.840 | 0.363 / 0.230 (subtype mean) |
+| | | | XGBoost | 0.910 | 0.806 | |
+| LYVE1 external | 1,663 (5) | 28% | Elastic Net | 0.860 | 0.745 | 0.494 / 0.283 (technical metrics) |
+| | | | XGBoost | 0.860 | 0.746 | |
+
+Mean of the per-patient values (Elastic Net): AUC 0.864 (LYVE1 internal), 0.901 (CCL19), 0.849 (LYVE1 external); the per-patient
+baselines are 0.722, 0.542 and 0.582. Random Forest is close to the other two models (pooled AUC 0.813 and 0.900).
+
+Notes: the average precision depends on the share of expressing cells (the no-skill level equals that share), so it should not be
+compared between genes. The pooled subtype-mean baseline for CCL19 has an AUC below 0.5 because the training mean shifts when a
+patient is held out; the per-patient value (0.54) is the fair comparison (likely explanation, not tested). Part of the AUC reflects
+recognising the expression-rich cell type, and a zero count can be a dropout rather than a true absence.
+
 ## 8. Genes that drive the predictions (Elastic Net)
 
 Genes with a non-zero coefficient in every leave-one-patient-out fold, always with the same sign. The folds overlap heavily, so

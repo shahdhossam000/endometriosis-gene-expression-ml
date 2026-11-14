@@ -9,7 +9,7 @@ better than simple baselines in held-out patients, and the LYVE1 result was supp
 Accuracy is moderate, varies a lot between patients, and the number of patients is small (see *Limitations*).
 Predictions reflect association, not a causal mechanism.
 
-> Status: work in progress. The Python/ML notebook is being added (`scripts/03_ml_python/`).
+> Status: analysis complete (R pipeline, ML notebook, external validation). Final write-up in progress.
 
 ## Data
 
@@ -47,6 +47,9 @@ Mean of the per-patient Spearman correlation between predicted and observed expr
 | CCL19, internal (7 patients) | 0.57 | 0.56 | 0.55 | 0.11 (subtype mean) |
 | LYVE1, external (5 patients, 1,663 cells) | 0.55 | - | 0.55 | 0.14 (technical metrics only) |
 
+ROC and precision-recall curves (expressing versus not, test patients pooled): ROC AUC about 0.83 to 0.84 for LYVE1 internal,
+0.91 to 0.92 for CCL19 and 0.86 for LYVE1 external, with simple baselines near chance (figures 5 and 6 in `figures/`).
+
 Additional checks: technical metrics alone predicted poorly; tuning Elastic Net hyperparameters did not improve performance;
 CCL19 prediction relied strongly on CCL21 (R2 fell from 0.34 to 0.08 without it, ranking changed little).
 
@@ -70,7 +73,7 @@ endo_ml/
 ├── scripts/
 │   ├── 01_r_pipeline/        01_endometriosis_pipeline.R
 │   ├── 02_external_prep/     02_external_validation_prep.R
-│   ├── 03_ml_python/         ML notebook (to be added)
+│   ├── 03_ml_python/         03_ml_prediction_and_external_validation.ipynb (Google Colab)
 │   └── archive/              early exploratory scripts
 ├── data/                     not tracked: raw/GSE179640_RAW, external/GSE213216
 ├── results/
@@ -92,7 +95,11 @@ endo_ml/
    Cluster numbers used for annotation come from the original run and should be re-checked against the DotPlots.
 4. For external validation, download the selected GSE213216 samples into `data/external/GSE213216/` and run
    `scripts/02_external_prep/02_external_validation_prep.R`.
-5. Run the Python notebook (Google Colab) on the exported files.
+5. Upload the exported files to a Google Drive folder named `endo_ml`: `macrophages_LYVE1.zip`, `external_macrophages.zip`,
+   `myeloid_clusters.csv` and a folder `mural_CCL19/` (lognorm.mtx, genes.txt, barcodes.txt, cell_metadata.csv); the files come from
+   `results/04_ml_export/`. Open `scripts/03_ml_python/03_ml_prediction_and_external_validation.ipynb` in Google Colab and run all cells.
+   Outputs (tables, predictions, figures) are written to `endo_ml/ml_outputs/`; copy them to `results/05_ml_results/` and `figures/`.
+   Running time was not measured; the Random Forest and the nested tuning are the slowest parts (flags at the top of the notebook).
 
 ## References
 

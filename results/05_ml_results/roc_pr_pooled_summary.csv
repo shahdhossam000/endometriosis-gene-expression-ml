@@ -1,0 +1,12 @@
+analysis,model,n_cells,n_patients,prevalence,roc_auc,average_precision
+LYVE1 internal (macrophages),Elastic Net,4416,10,0.321,0.833,0.715
+LYVE1 internal (macrophages),Random Forest,4416,10,0.321,0.813,0.686
+LYVE1 internal (macrophages),XGBoost,4416,10,0.321,0.839,0.722
+LYVE1 internal (macrophages),Subtype-mean baseline,4416,10,0.321,0.529,0.397
+CCL19 internal (mural cells),Elastic Net,1802,7,0.272,0.92,0.84
+CCL19 internal (mural cells),Random Forest,1802,7,0.272,0.9,0.755
+CCL19 internal (mural cells),XGBoost,1802,7,0.272,0.91,0.806
+CCL19 internal (mural cells),Subtype-mean baseline,1802,7,0.272,0.363,0.23
+LYVE1 external (independent cohort),Elastic Net,1663,5,0.281,0.86,0.745
+LYVE1 external (independent cohort),XGBoost,1663,5,0.281,0.86,0.746
+LYVE1 external (independent cohort),Technical metrics only,1663,5,0.281,0.494,0.283

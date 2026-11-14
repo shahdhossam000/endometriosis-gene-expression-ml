@@ -1,0 +1,84 @@
+analysis,model,patient,n_cells,n_expressing,prevalence,roc_auc,average_precision
+LYVE1 internal (macrophages),Elastic Net,E01,815,427,0.524,0.81,0.818
+LYVE1 internal (macrophages),Elastic Net,E02,462,52,0.113,0.926,0.726
+LYVE1 internal (macrophages),Elastic Net,E03,763,65,0.085,0.887,0.783
+LYVE1 internal (macrophages),Elastic Net,E04,326,76,0.233,0.907,0.832
+LYVE1 internal (macrophages),Elastic Net,E05,554,177,0.319,0.846,0.785
+LYVE1 internal (macrophages),Elastic Net,E06,170,67,0.394,0.955,0.942
+LYVE1 internal (macrophages),Elastic Net,E07,211,74,0.351,0.819,0.72
+LYVE1 internal (macrophages),Elastic Net,E09,273,160,0.586,0.898,0.928
+LYVE1 internal (macrophages),Elastic Net,E10,54,33,0.611,0.932,0.956
+LYVE1 internal (macrophages),Elastic Net,E11,788,286,0.363,0.657,0.567
+LYVE1 internal (macrophages),Random Forest,E01,815,427,0.524,0.796,0.795
+LYVE1 internal (macrophages),Random Forest,E02,462,52,0.113,0.845,0.618
+LYVE1 internal (macrophages),Random Forest,E03,763,65,0.085,0.903,0.785
+LYVE1 internal (macrophages),Random Forest,E04,326,76,0.233,0.878,0.78
+LYVE1 internal (macrophages),Random Forest,E05,554,177,0.319,0.838,0.764
+LYVE1 internal (macrophages),Random Forest,E06,170,67,0.394,0.935,0.921
+LYVE1 internal (macrophages),Random Forest,E07,211,74,0.351,0.807,0.684
+LYVE1 internal (macrophages),Random Forest,E09,273,160,0.586,0.845,0.874
+LYVE1 internal (macrophages),Random Forest,E10,54,33,0.611,0.947,0.964
+LYVE1 internal (macrophages),Random Forest,E11,788,286,0.363,0.649,0.574
+LYVE1 internal (macrophages),XGBoost,E01,815,427,0.524,0.819,0.82
+LYVE1 internal (macrophages),XGBoost,E02,462,52,0.113,0.91,0.648
+LYVE1 internal (macrophages),XGBoost,E03,763,65,0.085,0.913,0.793
+LYVE1 internal (macrophages),XGBoost,E04,326,76,0.233,0.904,0.811
+LYVE1 internal (macrophages),XGBoost,E05,554,177,0.319,0.844,0.784
+LYVE1 internal (macrophages),XGBoost,E06,170,67,0.394,0.946,0.931
+LYVE1 internal (macrophages),XGBoost,E07,211,74,0.351,0.781,0.655
+LYVE1 internal (macrophages),XGBoost,E09,273,160,0.586,0.871,0.899
+LYVE1 internal (macrophages),XGBoost,E10,54,33,0.611,0.944,0.962
+LYVE1 internal (macrophages),XGBoost,E11,788,286,0.363,0.658,0.578
+LYVE1 internal (macrophages),Subtype-mean baseline,E01,815,427,0.524,0.54,0.553
+LYVE1 internal (macrophages),Subtype-mean baseline,E02,462,52,0.113,0.757,0.394
+LYVE1 internal (macrophages),Subtype-mean baseline,E03,763,65,0.085,0.823,0.486
+LYVE1 internal (macrophages),Subtype-mean baseline,E04,326,76,0.233,0.729,0.442
+LYVE1 internal (macrophages),Subtype-mean baseline,E05,554,177,0.319,0.703,0.464
+LYVE1 internal (macrophages),Subtype-mean baseline,E06,170,67,0.394,0.801,0.65
+LYVE1 internal (macrophages),Subtype-mean baseline,E07,211,74,0.351,0.716,0.53
+LYVE1 internal (macrophages),Subtype-mean baseline,E09,273,160,0.586,0.72,0.74
+LYVE1 internal (macrophages),Subtype-mean baseline,E10,54,33,0.611,0.877,0.885
+LYVE1 internal (macrophages),Subtype-mean baseline,E11,788,286,0.363,0.551,0.389
+CCL19 internal (mural cells),Elastic Net,C02,194,13,0.067,0.758,0.242
+CCL19 internal (mural cells),Elastic Net,E01,244,41,0.168,0.968,0.868
+CCL19 internal (mural cells),Elastic Net,E02,298,78,0.262,0.882,0.764
+CCL19 internal (mural cells),Elastic Net,E03,574,258,0.449,0.925,0.914
+CCL19 internal (mural cells),Elastic Net,E04,149,26,0.174,0.866,0.568
+CCL19 internal (mural cells),Elastic Net,E05,153,51,0.333,0.967,0.953
+CCL19 internal (mural cells),Elastic Net,E06,190,23,0.121,0.941,0.834
+CCL19 internal (mural cells),Random Forest,C02,194,13,0.067,0.739,0.167
+CCL19 internal (mural cells),Random Forest,E01,244,41,0.168,0.935,0.765
+CCL19 internal (mural cells),Random Forest,E02,298,78,0.262,0.841,0.699
+CCL19 internal (mural cells),Random Forest,E03,574,258,0.449,0.934,0.909
+CCL19 internal (mural cells),Random Forest,E04,149,26,0.174,0.864,0.561
+CCL19 internal (mural cells),Random Forest,E05,153,51,0.333,0.967,0.951
+CCL19 internal (mural cells),Random Forest,E06,190,23,0.121,0.962,0.844
+CCL19 internal (mural cells),XGBoost,C02,194,13,0.067,0.756,0.179
+CCL19 internal (mural cells),XGBoost,E01,244,41,0.168,0.955,0.827
+CCL19 internal (mural cells),XGBoost,E02,298,78,0.262,0.845,0.716
+CCL19 internal (mural cells),XGBoost,E03,574,258,0.449,0.921,0.913
+CCL19 internal (mural cells),XGBoost,E04,149,26,0.174,0.834,0.452
+CCL19 internal (mural cells),XGBoost,E05,153,51,0.333,0.974,0.96
+CCL19 internal (mural cells),XGBoost,E06,190,23,0.121,0.942,0.832
+CCL19 internal (mural cells),Subtype-mean baseline,C02,194,13,0.067,0.508,0.068
+CCL19 internal (mural cells),Subtype-mean baseline,E01,244,41,0.168,0.508,0.17
+CCL19 internal (mural cells),Subtype-mean baseline,E02,298,78,0.262,0.56,0.287
+CCL19 internal (mural cells),Subtype-mean baseline,E03,574,258,0.449,0.628,0.523
+CCL19 internal (mural cells),Subtype-mean baseline,E04,149,26,0.174,0.581,0.202
+CCL19 internal (mural cells),Subtype-mean baseline,E05,153,51,0.333,0.456,0.315
+CCL19 internal (mural cells),Subtype-mean baseline,E06,190,23,0.121,0.554,0.134
+LYVE1 external (independent cohort),Elastic Net,X07,198,48,0.242,0.836,0.739
+LYVE1 external (independent cohort),Elastic Net,X08,346,154,0.445,0.871,0.874
+LYVE1 external (independent cohort),Elastic Net,X09,362,138,0.381,0.832,0.741
+LYVE1 external (independent cohort),Elastic Net,X11,667,108,0.162,0.858,0.62
+LYVE1 external (independent cohort),Elastic Net,X14,90,19,0.211,0.847,0.632
+LYVE1 external (independent cohort),XGBoost,X07,198,48,0.242,0.847,0.708
+LYVE1 external (independent cohort),XGBoost,X08,346,154,0.445,0.871,0.857
+LYVE1 external (independent cohort),XGBoost,X09,362,138,0.381,0.825,0.781
+LYVE1 external (independent cohort),XGBoost,X11,667,108,0.162,0.884,0.64
+LYVE1 external (independent cohort),XGBoost,X14,90,19,0.211,0.789,0.533
+LYVE1 external (independent cohort),Technical metrics only,X07,198,48,0.242,0.55,0.286
+LYVE1 external (independent cohort),Technical metrics only,X08,346,154,0.445,0.596,0.55
+LYVE1 external (independent cohort),Technical metrics only,X09,362,138,0.381,0.522,0.406
+LYVE1 external (independent cohort),Technical metrics only,X11,667,108,0.162,0.579,0.2
+LYVE1 external (independent cohort),Technical metrics only,X14,90,19,0.211,0.663,0.357
