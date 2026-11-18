@@ -1,0 +1,6 @@
+{
+  "name": "EndoScope Ai",
+  "description": "EndoScope Ai: Computational pathology and single-cell transcriptomics research workbench for endometriosis gene exploration, microenvironment crosstalk, pathway enrichment, and explainable ML hypothesis generation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
