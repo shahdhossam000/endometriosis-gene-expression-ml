@@ -1,107 +1,153 @@
-# Predicting LYVE1 and CCL19 expression in unseen endometriosis patients from single-cell RNA-seq
+# Endometriosis Single-Cell Transcriptomic Analysis and Machine Learning
 
-**Question:** can machine learning predict the expression level of selected immune-regulatory genes
-(LYVE1 in macrophages, CCL19 in perivascular/mural cells) in cells from patients that were not used for training,
-using the expression of other genes?
+This project explores gene expression patterns and cellular changes associated with endometriosis using single-cell RNA sequencing (scRNA-seq) data. It combines transcriptomic analysis, pathway enrichment, cell-cell communication analysis, and machine learning approaches to investigate molecular differences across tissue types.
 
-**Short answer from this analysis:** partly. Ranking of cells by expression of the target gene was predicted
-better than simple baselines in held-out patients, and the LYVE1 result was supported in an independent cohort.
-Accuracy is moderate, varies a lot between patients, and the number of patients is small (see *Limitations*).
-Predictions reflect association, not a causal mechanism.
-
-> Status: analysis complete (R pipeline, ML notebook, external validation). Final write-up in progress.
+The project also includes **EndoScope AI**, an interactive web application developed to make the analysis results easier to explore and interpret.
 
 ## Data
 
-| Dataset | Use | Source |
-|---|---|---|
-| GSE179640 (Tan et al., 2022, Nature Cell Biology) | training and internal evaluation: 31 single-cell biopsies from 14 individuals (control, eutopic, peritoneal and ovarian lesions) | GEO |
-| GSE213216 (Fonseca et al., 2023, Nature Genetics) | external validation (LYVE1 only): samples screened from 14 patients, 5 used for testing | GEO |
+The main dataset used in this project is:
 
-Raw data and large intermediate files are **not** in this repository (see `.gitignore`).
-Download the data from GEO and place it as shown below.
+- **GSE179640** – Single-cell RNA-seq dataset containing 104,343 cells and 27,722 genes from 14 individuals.
+- **GSE213216** – An independent dataset used for external validation.
 
-## Analysis overview
+The analysis includes control and endometriosis-associated tissue samples, including ectopic lesions (EcP), eutopic endometrium (EuE), and other tissue types.
 
-1. **Quality control** per sample: cells with at least 500 genes, at least 1,000 UMIs, at most 100,000 UMIs, and less than 25% mitochondrial reads;
-   genes detected in at least 3 cells. Doublets removed with scDblFinder. Result: 104,343 cells, 27,722 genes shared by all samples.
-2. **Normalization** to the median UMI count (log), 2,000 variable genes, PCA, Harmony (patient) for clustering only, 23 clusters.
-3. **Annotation** (manual, from marker DotPlots): five major cell types; myeloid cells re-clustered to find macrophages;
-   stromal cells re-clustered to find mural cells.
-4. **Target screening:** per gene, group, tissue and patient, how many patients have enough expressing cells.
-   Target groups: all macrophages for LYVE1 (4,762 cells, 10 usable patients) and all mural cells for CCL19 (2,537 cells, 7 usable patients).
-5. **Machine learning (Python):** Elastic Net, Random Forest and XGBoost regression, one model per target gene,
-   leave-one-patient-out evaluation. The target gene is excluded from the inputs and feature selection uses training cells only.
-   Baselines: subtype mean, cluster mean, technical metrics only (UMI count, genes detected, mitochondrial fraction).
-6. **External validation** (LYVE1): macrophage-like cells from an independent cohort, processed with the same QC, doublet removal
-   and normalization; models were applied without retuning.
+**Note:** EuE represents eutopic endometrium from patients with endometriosis, not healthy control tissue.
 
-## Main results
+## Analysis Overview
 
-Mean of the per-patient Spearman correlation between predicted and observed expression (test patients only):
+The workflow includes:
 
-| Setting | Elastic Net | Random Forest | XGBoost | Baseline |
-|---|---|---|---|---|
-| LYVE1, internal (10 patients) | 0.60 | 0.58 | 0.60 | 0.48 (subtype mean) |
-| LYVE1, internal, without the LYVE1-defined cluster | 0.38 | - | 0.37 | 0.04 (cluster mean) |
-| CCL19, internal (7 patients) | 0.57 | 0.56 | 0.55 | 0.11 (subtype mean) |
-| LYVE1, external (5 patients, 1,663 cells) | 0.55 | - | 0.55 | 0.14 (technical metrics only) |
+- Quality control and preprocessing
+- Normalization and dimensionality reduction
+- Batch correction and clustering
+- Cell type annotation
+- Cell composition analysis
+- Differential gene expression analysis
+- GO and KEGG pathway enrichment
+- Cell-cell communication analysis using CellChat
+- Machine learning for gene-expression-related prediction
+- Model interpretation using SHAP
+- External validation using an independent dataset
 
-ROC and precision-recall curves (expressing versus not, test patients pooled): ROC AUC about 0.83 to 0.84 for LYVE1 internal,
-0.91 to 0.92 for CCL19 and 0.86 for LYVE1 external, with simple baselines near chance (figures 5 and 6 in `figures/`).
+## Main Results
 
-Additional checks: technical metrics alone predicted poorly; tuning Elastic Net hyperparameters did not improve performance;
-CCL19 prediction relied strongly on CCL21 (R2 fell from 0.34 to 0.08 without it, ranking changed little).
+### Differential Expression
+
+A paired pseudobulk comparison of stromal cells between EcP and EuE samples identified **810 significantly differentially expressed genes**:
+
+- 614 upregulated genes in EcP
+- 196 downregulated genes in EcP
+
+The comparison included eight patients with paired samples.
+
+### Functional Enrichment
+
+GO Biological Process analysis highlighted upregulated terms related to:
+
+- Leukocyte migration and chemotaxis
+- Myeloid leukocyte migration
+- Extracellular matrix organization
+- Regulation of vasculature development
+- Angiogenesis
+
+KEGG analysis identified 18 significantly enriched pathways among upregulated genes, including ECM-receptor interaction, cytokine-cytokine receptor interaction, calcium signaling, and leukocyte transendothelial migration.
+
+No significantly enriched downregulated KEGG pathways were detected.
+
+### Cell Composition
+
+Patient-level paired comparisons of EcP and EuE showed differences in the proportions of some cell populations. However, no cell type remained statistically significant after multiple-testing correction.
+
+### Cell-Cell Communication
+
+CellChat was used to explore communication patterns between lymphocytes, myeloid cells, and stromal cells.
+
+Although several interaction patterns were observed, no paired comparison remained statistically significant after Benjamini-Hochberg correction. These findings are therefore considered exploratory.
+
+## Machine Learning
+
+Machine learning models were developed to investigate gene-expression-related patterns in selected cell populations.
+
+The workflow includes:
+
+- Elastic Net
+- Random Forest
+- XGBoost
+- Leave-One-Patient-Out (LOPO) validation
+- External validation
+- SHAP-based model interpretation
+
+LYVE1 prediction was investigated in macrophages, with external validation using GSE213216.
+
+A separate CCL19 detection model was developed in stromal cells. This model predicts whether CCL19 is detected in a cell (zero versus non-zero expression), rather than predicting its continuous expression level.
+
+SHAP values were used to understand how features contribute to model predictions. They should not be interpreted as evidence of biological causality or direct gene regulation.
+
+## EndoScope AI – Interactive Web Application
+
+**Website:** https://endoscope-ai.ai.studio/
+
+EndoScope AI is an interactive platform developed as part of this project to help users explore single-cell transcriptomic data and the resulting analyses.
+
+The application provides access to:
+
+- Gene Explorer
+- Cell Atlas
+- Differential Expression
+- Pathway Analysis
+- Cell-Cell Communication
+- AI and Machine Learning Insights
+
+The website presents analytical outputs in an accessible format, allowing users to explore gene expression, cell populations, and molecular findings.
 
 ## Limitations
 
-- Few patients (10 internal for LYVE1, 7 for CCL19, 5 external); per-patient performance varies widely.
-- Test patients were selected for detectable expression of the target gene, in both internal and external evaluation.
-- External validation covers LYVE1 only; 4 of 5 external patients are endometrioma samples. CCL19 was not validated externally.
-- Cell annotation was done on all patients before the train/test split. Clusters used for the target groups were partly defined by genes
-  related to the targets (partial circularity); an analysis without the LYVE1-defined cluster is reported above.
-- Doublet removal differs from the original study (scDblFinder only). Four EOR samples were excluded without investigating why.
-- Hyperparameters of Random Forest and XGBoost were not tuned.
-- Hormonal treatment and cycle phase were not available for the external samples.
+- The main dataset contains a relatively limited number of individuals.
+- EuE samples are derived from endometriosis patients and should not be treated as healthy controls.
+- Cell composition and CellChat comparisons did not show statistically significant results after multiple-testing correction.
+- Gene expression summaries aggregated across cells are descriptive and do not replace patient-level statistical analysis.
+- External validation was performed for the LYVE1 model; the CCL19 model requires further independent validation.
+- Machine learning predictions and SHAP explanations do not establish biological causality or clinical validity.
 
-## Repository structure
+## Repository Structure
 
-```
-endo_ml/
-├── README.md
-├── endo_ml.Rproj
+```text
+endometriosis-gene-expression-ml/
+│
+├── data/
+│
 ├── scripts/
-│   ├── 01_r_pipeline/        01_endometriosis_pipeline.R
-│   ├── 02_external_prep/     02_external_validation_prep.R
-│   ├── 03_ml_python/         03_ml_prediction_and_external_validation.ipynb (Google Colab)
-│   └── archive/              early exploratory scripts
-├── data/                     not tracked: raw/GSE179640_RAW, external/GSE213216
+│   └── 03_ml_python/
+│
 ├── results/
-│   ├── 01_processing/        QC and normalization checkpoints (not tracked)
-│   ├── 02_annotation/        annotated objects (not tracked)
-│   ├── 03_target_screening/  tables: patients with enough expressing cells
-│   ├── 04_ml_export/         inputs for the ML part (not tracked)
-│   ├── 05_ml_results/        predictions and tables from the ML notebook
-│   └── 06_external_validation/
+│   ├── pathway_analysis/
+│   └── ...
+│
 ├── figures/
-└── summary_and_results/
+│
+├── summary_and_results/
+│
+├── EndoScope_AI_Website/
+│
+└── README.md
 ```
 
-## How to run
+## How to Run
 
-1. Open `endo_ml.Rproj` in RStudio (R 4.6; Seurat, harmony, scDblFinder, tidyverse, hdf5r).
-2. Download GSE179640_RAW from GEO and extract it into `data/raw/GSE179640_RAW/`.
-3. Run `scripts/01_r_pipeline/01_endometriosis_pipeline.R` section by section (restart R between sections on a 16 GB machine).
-   Cluster numbers used for annotation come from the original run and should be re-checked against the DotPlots.
-4. For external validation, download the selected GSE213216 samples into `data/external/GSE213216/` and run
-   `scripts/02_external_prep/02_external_validation_prep.R`.
-5. Upload the exported files to a Google Drive folder named `endo_ml`: `macrophages_LYVE1.zip`, `external_macrophages.zip`,
-   `myeloid_clusters.csv` and a folder `mural_CCL19/` (lognorm.mtx, genes.txt, barcodes.txt, cell_metadata.csv); the files come from
-   `results/04_ml_export/`. Open `scripts/03_ml_python/03_ml_prediction_and_external_validation.ipynb` in Google Colab and run all cells.
-   Outputs (tables, predictions, figures) are written to `endo_ml/ml_outputs/`; copy them to `results/05_ml_results/` and `figures/`.
-   Running time was not measured; the Random Forest and the nested tuning are the slowest parts (flags at the top of the notebook).
+The analysis scripts and notebooks are organized in the repository.
+
+1. Clone or download the repository.
+2. Install the required R and Python packages.
+3. Download the datasets from GEO.
+4. Run the analysis scripts in the appropriate order.
+5. Explore the results and visualizations.
+
+The interactive web application can also be accessed directly through the website link above.
 
 ## References
 
-- Tan Y, et al. Single-cell analysis of endometriosis reveals a coordinated transcriptional programme driving immunotolerance and angiogenesis across eutopic and ectopic tissues. Nat Cell Biol. 2022.
-- Fonseca MAS, et al. Single-cell transcriptomic analysis of endometriosis. Nat Genet. 2023.
+- GSE179640 – Gene Expression Omnibus.
+- GSE213216 – Gene Expression Omnibus.
+- Relevant publications associated with the datasets are available through the NCBI GEO records.
