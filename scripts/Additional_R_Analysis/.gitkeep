@@ -1,1 +1,461 @@
+1. 01_Pathway_Analysis.R
+# ============================================================
+# Pathway Analysis
+# Differential expression: EcP vs EuE
+# Endometriosis project
+# ============================================================
 
+# 1. Load packages
+packages <- c(
+  "tidyverse",
+  "clusterProfiler",
+  "org.Hs.eg.db",
+  "enrichplot",
+  "ggplot2"
+)
+
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+}
+
+library(tidyverse)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(enrichplot)
+library(ggplot2)
+
+# 2. Input and output paths
+input_file <- "results/PathwayAnalysis/DEG_EcP_vs_EuE.csv"
+output_dir <- "results/New_Analysis_Results/PathwayAnalysis"
+
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+# 3. Read differential expression results
+deg <- read.csv(input_file, check.names = FALSE)
+
+# IMPORTANT:
+# Update these column names if your CSV uses different names.
+gene_col <- "gene"
+padj_col <- "padj"
+logfc_col <- "log2FoldChange"
+
+# 4. Clean data
+deg <- deg %>%
+  filter(
+    !is.na(.data[[gene_col]]),
+    !is.na(.data[[padj_col]]),
+    !is.na(.data[[logfc_col]])
+  )
+
+# 5. Identify significant genes
+significant_genes <- deg %>%
+  filter(.data[[padj_col]] < 0.05)
+
+upregulated <- significant_genes %>%
+  filter(.data[[logfc_col]] > 0)
+
+downregulated <- significant_genes %>%
+  filter(.data[[logfc_col]] < 0)
+
+# 6. Save gene lists
+write.csv(upregulated,
+          file.path(output_dir, "Upregulated_Genes.csv"),
+          row.names = FALSE)
+
+write.csv(downregulated,
+          file.path(output_dir, "Downregulated_Genes.csv"),
+          row.names = FALSE)
+
+# 7. Convert gene symbols to Entrez IDs
+convert_genes <- function(genes) {
+  bitr(
+    unique(genes),
+    fromType = "SYMBOL",
+    toType = "ENTREZID",
+    OrgDb = org.Hs.eg.db
+  )
+}
+
+up_ids <- convert_genes(upregulated[[gene_col]])
+down_ids <- convert_genes(downregulated[[gene_col]])
+
+# 8. GO Biological Process enrichment
+go_up <- enrichGO(
+  gene = up_ids$ENTREZID,
+  OrgDb = org.Hs.eg.db,
+  keyType = "ENTREZID",
+  ont = "BP",
+  pAdjustMethod = "BH",
+  pvalueCutoff = 0.05,
+  qvalueCutoff = 0.05,
+  readable = TRUE
+)
+
+go_down <- enrichGO(
+  gene = down_ids$ENTREZID,
+  OrgDb = org.Hs.eg.db,
+  keyType = "ENTREZID",
+  ont = "BP",
+  pAdjustMethod = "BH",
+  pvalueCutoff = 0.05,
+  qvalueCutoff = 0.05,
+  readable = TRUE
+)
+
+# 9. Save GO results
+write.csv(
+  as.data.frame(go_up),
+  file.path(output_dir, "GO_BP_Upregulated_all.csv"),
+  row.names = FALSE
+)
+
+write.csv(
+  as.data.frame(go_down),
+  file.path(output_dir, "GO_BP_Downregulated_all.csv"),
+  row.names = FALSE
+)
+
+# 10. Top 20 GO terms
+write.csv(
+  as.data.frame(go_up) %>% slice_head(n = 20),
+  file.path(output_dir, "GO_BP_Upregulated_top20.csv"),
+  row.names = FALSE
+)
+
+write.csv(
+  as.data.frame(go_down) %>% slice_head(n = 20),
+  file.path(output_dir, "GO_BP_Downregulated_top20.csv"),
+  row.names = FALSE
+)
+
+# 11. KEGG enrichment
+kegg_up <- enrichKEGG(
+  gene = up_ids$ENTREZID,
+  organism = "hsa",
+  pAdjustMethod = "BH",
+  pvalueCutoff = 0.05
+)
+
+kegg_down <- enrichKEGG(
+  gene = down_ids$ENTREZID,
+  organism = "hsa",
+  pAdjustMethod = "BH",
+  pvalueCutoff = 0.05
+)
+
+write.csv(
+  as.data.frame(kegg_up),
+  file.path(output_dir, "KEGG_Upregulated.csv"),
+  row.names = FALSE
+)
+
+write.csv(
+  as.data.frame(kegg_down),
+  file.path(output_dir, "KEGG_Downregulated.csv"),
+  row.names = FALSE
+)
+
+# 12. Plot GO enrichment
+if (nrow(as.data.frame(go_up)) > 0) {
+  p1 <- dotplot(go_up, showCategory = 20) +
+    ggtitle("GO Biological Process - Upregulated")
+
+  ggsave(
+    file.path(output_dir, "GO_BP_Upregulated.png"),
+    p1, width = 10, height = 8, dpi = 300
+  )
+}
+
+if (nrow(as.data.frame(go_down)) > 0) {
+  p2 <- dotplot(go_down, showCategory = 20) +
+    ggtitle("GO Biological Process - Downregulated")
+
+  ggsave(
+    file.path(output_dir, "GO_BP_Downregulated.png"),
+    p2, width = 10, height = 8, dpi = 300
+  )
+}
+
+# 13. Plot KEGG enrichment
+if (nrow(as.data.frame(kegg_up)) > 0) {
+  p3 <- dotplot(kegg_up, showCategory = 20) +
+    ggtitle("KEGG - Upregulated")
+
+  ggsave(
+    file.path(output_dir, "KEGG_Upregulated.png"),
+    p3, width = 10, height = 8, dpi = 300
+  )
+}
+
+cat("Pathway analysis completed.\n")
+
+2. 02_CellChat_Analysis.R
+# ============================================================
+# CellChat Analysis
+# Paired EcP vs EuE
+# ============================================================
+
+library(CellChat)
+library(Seurat)
+library(tidyverse)
+library(patchwork)
+
+# 1. Input
+input_file <- "data/processed/combined_seurat.rds"
+
+output_dir <- "results/New_Analysis_Results/CellChat"
+
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+# 2. Load Seurat object
+seurat_obj <- readRDS(input_file)
+
+# 3. Define tissues and patients
+patients <- c(
+  "E01", "E02", "E03", "E04",
+  "E05", "E06", "E07", "E09"
+)
+
+tissues <- c("EcP", "EuE")
+
+# 4. Define cell types
+selected_cells <- c(
+  "Lymphocytes",
+  "Myeloid",
+  "Stromal"
+)
+
+# 5. Create CellChat objects
+cellchat_objects <- list()
+
+for (patient in patients) {
+
+  for (tissue in tissues) {
+
+    subset_cells <- colnames(seurat_obj)[
+      seurat_obj$patient == patient &
+      seurat_obj$tissue == tissue &
+      seurat_obj$cell_type %in% selected_cells
+    ]
+
+    if (length(subset_cells) == 0) next
+
+    obj <- subset(seurat_obj, cells = subset_cells)
+
+    data.input <- GetAssayData(
+      obj,
+      assay = "RNA",
+      layer = "data"
+    )
+
+    meta <- obj@meta.data
+
+    cellchat <- createCellChat(
+      object = data.input,
+      meta = meta,
+      group.by = "cell_type"
+    )
+
+    cellchat@DB <- CellChatDB.human
+
+    cellchat <- subsetData(cellchat)
+    cellchat <- identifyOverExpressedGenes(cellchat)
+    cellchat <- identifyOverExpressedInteractions(cellchat)
+
+    cellchat <- computeCommunProb(cellchat)
+    cellchat <- filterCommunication(
+      cellchat,
+      min.cells = 10
+    )
+
+    cellchat <- computeCommunProbPathway(cellchat)
+    cellchat <- aggregateNet(cellchat)
+
+    saveRDS(
+      cellchat,
+      file.path(
+        output_dir,
+        paste0("CellChat_", patient, "_", tissue, ".rds")
+      )
+    )
+
+    cellchat_objects[[paste(patient, tissue, sep = "_")]] <- cellchat
+  }
+}
+
+# 6. Save communication tables
+for (name in names(cellchat_objects)) {
+
+  communication <- subsetCommunication(
+    cellchat_objects[[name]]
+  )
+
+  write.csv(
+    communication,
+    file.path(
+      output_dir,
+      paste0(name, "_Communication.csv")
+    ),
+    row.names = FALSE
+  )
+}
+
+# 7. Save summary
+summary_table <- tibble(
+  Sample = names(cellchat_objects),
+  Total_Interactions = sapply(
+    cellchat_objects,
+    function(x) sum(x@net$count)
+  ),
+  Interaction_Strength = sapply(
+    cellchat_objects,
+    function(x) sum(x@net$weight)
+  )
+)
+
+write.csv(
+  summary_table,
+  file.path(output_dir, "CellChat_Summary.csv"),
+  row.names = FALSE
+)
+
+cat("CellChat analysis completed.\n")
+
+3. 03_Cell_Composition_Analysis.R
+# ============================================================
+# Cell Composition Analysis
+# Paired EcP vs EuE
+# ============================================================
+
+library(Seurat)
+library(tidyverse)
+library(ggplot2)
+
+# 1. Input and output
+input_file <- "data/processed/combined_seurat.rds"
+
+output_dir <- "results/New_Analysis_Results/CellComposition"
+
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+# 2. Load Seurat object
+seurat_obj <- readRDS(input_file)
+
+# 3. Select paired patients
+patients <- c(
+  "E01", "E02", "E03", "E04",
+  "E05", "E06", "E07", "E09"
+)
+
+# 4. Extract metadata
+metadata <- seurat_obj@meta.data %>%
+  rownames_to_column("Cell") %>%
+  filter(
+    patient %in% patients,
+    tissue %in% c("EcP", "EuE")
+  )
+
+# 5. Calculate cell counts
+cell_counts <- metadata %>%
+  count(patient, tissue, cell_type, name = "Cell_Count")
+
+# 6. Calculate proportions within each sample
+cell_proportions <- cell_counts %>%
+  group_by(patient, tissue) %>%
+  mutate(
+    Total_Cells = sum(Cell_Count),
+    Proportion = Cell_Count / Total_Cells,
+    Percentage = Proportion * 100
+  ) %>%
+  ungroup()
+
+# 7. Save results
+write.csv(
+  cell_counts,
+  file.path(output_dir, "Cell_Counts.csv"),
+  row.names = FALSE
+)
+
+write.csv(
+  cell_proportions,
+  file.path(output_dir, "Cell_Proportions.csv"),
+  row.names = FALSE
+)
+
+# 8. Calculate group averages
+group_summary <- cell_proportions %>%
+  group_by(tissue, cell_type) %>%
+  summarise(
+    Mean_Percentage = mean(Percentage),
+    SD = sd(Percentage),
+    .groups = "drop"
+  )
+
+write.csv(
+  group_summary,
+  file.path(output_dir, "Cell_Composition_Summary.csv"),
+  row.names = FALSE
+)
+
+# 9. Plot cell composition
+p <- ggplot(
+  group_summary,
+  aes(
+    x = tissue,
+    y = Mean_Percentage,
+    fill = cell_type
+  )
+) +
+  geom_col(position = "stack") +
+  labs(
+    title = "Cell Composition: EcP vs EuE",
+    x = "Tissue",
+    y = "Mean Cell Percentage",
+    fill = "Cell Type"
+  ) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(
+      hjust = 0.5,
+      face = "bold"
+    )
+  )
+
+ggsave(
+  file.path(output_dir, "Cell_Composition.png"),
+  p,
+  width = 10,
+  height = 7,
+  dpi = 300
+)
+
+# 10. Paired Wilcoxon tests
+paired_results <- cell_proportions %>%
+  select(patient, tissue, cell_type, Percentage) %>%
+  pivot_wider(
+    names_from = tissue,
+    values_from = Percentage
+  ) %>%
+  group_by(cell_type) %>%
+  summarise(
+    N_Paired = sum(complete.cases(EcP, EuE)),
+    P_Value = ifelse(
+      N_Paired >= 2,
+      wilcox.test(EcP, EuE, paired = TRUE)$p.value,
+      NA_real_
+    ),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    Adjusted_P_Value = p.adjust(P_Value, method = "BH")
+  )
+
+write.csv(
+  paired_results,
+  file.path(output_dir, "Paired_Cell_Composition_Statistics.csv"),
+  row.names = FALSE
+)
+
+cat("Cell composition analysis completed.\n")
