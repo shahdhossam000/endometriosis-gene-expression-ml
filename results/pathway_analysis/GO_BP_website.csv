@@ -1,0 +1,30 @@
+"Direction","Description","GeneRatio","p.adjust"
+"Upregulated in EcP","leukocyte migration","45/525",1.16006451486549e-11
+"Upregulated in EcP","myeloid leukocyte migration","33/525",3.15585603038606e-11
+"Upregulated in EcP","regulation of vasculature development","39/525",3.11700728408093e-10
+"Upregulated in EcP","angiogenesis","53/525",3.11700728408093e-10
+"Upregulated in EcP","chemotaxis","47/525",3.11700728408093e-10
+"Upregulated in EcP","taxis","47/525",3.11700728408093e-10
+"Upregulated in EcP","regulation of angiogenesis","38/525",3.11700728408093e-10
+"Upregulated in EcP","regulation of leukocyte migration","31/525",8.27381635879099e-10
+"Upregulated in EcP","extracellular matrix organization","36/525",1.12944039043703e-09
+"Upregulated in EcP","extracellular structure organization","36/525",1.14508268333819e-09
+"Upregulated in EcP","external encapsulating structure organization","36/525",1.17190169294143e-09
+"Upregulated in EcP","epithelial cell proliferation","37/525",2.9080777393256e-09
+"Upregulated in EcP","regulation of epithelial cell proliferation","34/525",3.22061493091988e-09
+"Upregulated in EcP","cell chemotaxis","36/525",3.25084599479609e-09
+"Upregulated in EcP","positive regulation of vasculature development","26/525",2.88759029966581e-08
+"Upregulated in EcP","leukocyte chemotaxis","29/525",2.9370944423401e-08
+"Upregulated in EcP","positive regulation of angiogenesis","25/525",7.83586167615882e-08
+"Upregulated in EcP","negative regulation of leukocyte migration","13/525",1.00000463393956e-07
+"Upregulated in EcP","negative regulation of cell migration","32/525",2.91999497012397e-07
+"Upregulated in EcP","negative regulation of locomotion","33/525",4.38815816642671e-07
+"Downregulated in EcP","urogenital system development","7/149",1.40341271534677e-05
+"Downregulated in EcP","prostate gland development","6/149",2.09719048360833e-05
+"Downregulated in EcP","inorganic anion transport","9/149",0.00324393988729876
+"Downregulated in EcP","reproductive structure development","9/149",0.00424589894510952
+"Downregulated in EcP","reproductive system development","9/149",0.00424589894510952
+"Downregulated in EcP","biological process involved in intraspecies interaction between organisms","5/149",0.0119711920889706
+"Downregulated in EcP","digestive tract morphogenesis","4/149",0.0263060417347662
+"Downregulated in EcP","phosphate ion homeostasis","3/149",0.0336271434679215
+"Downregulated in EcP","receptor clustering","5/149",0.0480923633871993
