@@ -1,0 +1,91 @@
+# EndoScope AI
+### An AI-Powered Research Tool for Single-Cell RNA-seq Analysis
+
+**Website:** https://endoscope-ai.ai.studio/
+
+**Turning complex single-cell data into meaningful biological insights.**
+
+EndoScope AI is an AI-powered research tool designed to support researchers, bioinformaticians, and life science students in exploring and analyzing single-cell RNA sequencing (scRNA-seq) datasets.
+
+The goal is simple: **make advanced single-cell analysis more accessible, organized, and easier to explore — without losing sight of the biology behind the data.**
+
+---
+
+## What Can EndoScope AI Do?
+
+EndoScope AI brings essential single-cell analysis workflows together in one platform, helping researchers move from raw data exploration toward biological interpretation.
+
+### 1. Quality Control (QC)
+Assess data quality and identify potential low-quality cells before downstream analysis.
+
+### 2. Normalization & Clustering
+Prepare gene expression data for analysis, explore cellular heterogeneity, and identify distinct cell populations.
+
+### 3. Cell Annotation
+Explore cell identities using gene expression patterns and marker genes to support cell-type annotation.
+
+### 4. Downstream Analysis
+Investigate biological differences and cellular characteristics through additional analytical approaches.
+
+### 5. Differential Gene Expression
+Identify genes with different expression patterns between selected cell populations or biological conditions.
+
+### 6. Pathway Enrichment Analysis
+Explore biological processes and pathways associated with differentially expressed genes to gain more insight into the underlying biology.
+
+### 7. Cell Composition Analysis
+Compare cell-type distributions across samples or conditions and explore changes in the cellular landscape.
+
+### 8. Cell–Cell Communication
+Investigate potential interactions between cell populations and explore signaling communication within the cellular ecosystem.
+
+### 9. Gene Expression Explorer
+Explore the expression of selected genes across cell types and tissues, helping researchers investigate genes of biological interest.
+
+---
+
+## Why EndoScope AI?
+
+Single-cell RNA sequencing generates enormous amounts of complex biological data. Analyzing and interpreting these datasets often requires multiple tools, analytical steps, and bioinformatics experience.
+
+EndoScope AI aims to bring these steps into a more accessible research environment.
+
+- **Research-focused:** Designed around common analytical needs in single-cell research.
+- **Integrated workflows:** Brings multiple analysis steps together in one platform.
+- **Biological interpretation:** Helps researchers explore patterns and generate testable research questions.
+- **Accessible exploration:** Supports users in navigating complex scRNA-seq analyses.
+- **Flexible research applications:** Built to support exploration beyond a single disease or dataset, depending on data compatibility and workflow requirements.
+
+---
+
+## Who Is It For?
+
+EndoScope AI is designed for:
+
+- Biomedical and life science researchers.
+- Bioinformatics researchers and analysts.
+- Students working on single-cell RNA-seq projects.
+- Research teams exploring cellular heterogeneity and disease mechanisms.
+- Scientists investigating gene expression and cell communication.
+
+---
+
+## Beyond Analysis: Supporting Scientific Discovery
+
+EndoScope AI is more than an analysis interface. It is intended to help researchers explore their data, identify interesting biological patterns, and generate new directions for investigation.
+
+It does not replace scientific judgment or experimental validation. Instead, it serves as a research-support tool that can make complex analytical workflows easier to approach and interpret.
+
+---
+
+## Explore the Platform
+
+Ready to explore your single-cell data?
+
+**Website:** https://endoscope-ai.ai.studio/
+
+---
+
+*Founded & Developed by Shahd Hossam*
+
+*EndoScope AI — Explore cells. Discover patterns. Advance research.*
