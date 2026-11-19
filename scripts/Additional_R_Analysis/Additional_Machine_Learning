@@ -1,1 +1,440 @@
 
+# ============================================================
+# CCL19 Stromal Cell Analysis
+# Elastic Net Logistic Regression + Leave-One-Patient-Out CV
+# + SHAP Feature Interpretation
+# ============================================================
+
+from pathlib import Path
+import warnings
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    average_precision_score,
+    roc_auc_score,
+    brier_score_loss
+)
+
+warnings.filterwarnings("ignore")
+
+# -----------------------------
+# 1. Paths and settings
+# -----------------------------
+
+EXPRESSION_FILE = Path(
+    "data/processed/stromal_expression_matrix.csv"
+)
+
+METADATA_FILE = Path(
+    "data/processed/stromal_metadata.csv"
+)
+
+OUTPUT_DIR = Path(
+    "results/New_Analysis_Results/CCL19_ML"
+)
+
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+TARGET_GENE = "CCL19"
+MIN_POSITIVE_CELLS = 10
+TOP_N_GENES = 2000
+RANDOM_STATE = 42
+
+# -----------------------------
+# 2. Load data
+# -----------------------------
+
+expression = pd.read_csv(EXPRESSION_FILE)
+metadata = pd.read_csv(METADATA_FILE)
+
+required_metadata = [
+    "cell_id",
+    "patient",
+    "tissue",
+    "cell_type"
+]
+
+missing = [
+    col for col in required_metadata
+    if col not in metadata.columns
+]
+
+if missing:
+    raise ValueError(
+        f"Missing metadata columns: {missing}"
+    )
+
+if "cell_id" not in expression.columns:
+    raise ValueError(
+        "Expression file must contain a cell_id column."
+    )
+
+# Match cells between expression and metadata
+data = metadata.merge(
+    expression,
+    on="cell_id",
+    how="inner"
+)
+
+# Keep stromal cells only
+data = data[
+    data["cell_type"].astype(str).str.lower().str.contains(
+        "stromal", na=False
+    )
+].copy()
+
+if TARGET_GENE not in data.columns:
+    raise ValueError(
+        f"{TARGET_GENE} was not found in expression data."
+    )
+
+print("Number of stromal cells:", len(data))
+
+# -----------------------------
+# 3. Define prediction target
+# -----------------------------
+
+# Binary detection:
+# 1 = CCL19 expression > 0
+# 0 = CCL19 expression = 0
+
+data["y_detect"] = (
+    pd.to_numeric(data[TARGET_GENE], errors="coerce")
+    .fillna(0) > 0
+).astype(int)
+
+# Exclude CCL19 from predictor genes
+excluded_columns = (
+    required_metadata
+    + ["y_detect", TARGET_GENE]
+)
+
+gene_columns = [
+    col for col in data.columns
+    if col not in excluded_columns
+]
+
+# Keep numeric gene expression columns
+gene_columns = [
+    col for col in gene_columns
+    if pd.api.types.is_numeric_dtype(data[col])
+]
+
+# Remove genes with no variation
+gene_columns = [
+    gene for gene in gene_columns
+    if data[gene].nunique() > 1
+]
+
+print("Number of candidate genes:", len(gene_columns))
+
+# -----------------------------
+# 4. Select eligible patients
+# -----------------------------
+
+patient_summary = (
+    data.groupby("patient")["y_detect"]
+    .agg(["count", "sum"])
+    .reset_index()
+)
+
+eligible_patients = patient_summary.loc[
+    patient_summary["sum"] >= MIN_POSITIVE_CELLS,
+    "patient"
+].tolist()
+
+data = data[
+    data["patient"].isin(eligible_patients)
+].copy()
+
+print("Eligible patients:", eligible_patients)
+
+patient_summary.to_csv(
+    OUTPUT_DIR / "Patient_CCL19_Summary.csv",
+    index=False
+)
+
+# -----------------------------
+# 5. Leave-One-Patient-Out CV
+# -----------------------------
+
+fold_results = []
+all_predictions = []
+fold_feature_importance = []
+
+for test_patient in eligible_patients:
+
+    print(f"\nTesting patient: {test_patient}")
+
+    train = data[
+        data["patient"] != test_patient
+    ].copy()
+
+    test = data[
+        data["patient"] == test_patient
+    ].copy()
+
+    y_train = train["y_detect"].values
+    y_test = test["y_detect"].values
+
+    # Check that training data contains both classes
+    if len(np.unique(y_train)) < 2:
+        print("Skipping fold: training data has one class.")
+        continue
+
+    # Select the top variable genes using training data only
+    gene_variance = train[gene_columns].var()
+
+    selected_genes = (
+        gene_variance
+        .sort_values(ascending=False)
+        .head(TOP_N_GENES)
+        .index.tolist()
+    )
+
+    X_train = train[selected_genes].fillna(0).values
+    X_test = test[selected_genes].fillna(0).values
+
+    # Standardization
+    scaler = StandardScaler()
+
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    # Elastic Net Logistic Regression
+    model = LogisticRegression(
+        penalty="elasticnet",
+        solver="saga",
+        l1_ratio=0.5,
+        C=1.0,
+        max_iter=5000,
+        class_weight="balanced",
+        random_state=RANDOM_STATE
+    )
+
+    model.fit(X_train_scaled, y_train)
+
+    probabilities = model.predict_proba(
+        X_test_scaled
+    )[:, 1]
+
+    # Evaluation
+    pr_auc = average_precision_score(
+        y_test, probabilities
+    )
+
+    roc_auc = (
+        roc_auc_score(y_test, probabilities)
+        if len(np.unique(y_test)) == 2
+        else np.nan
+    )
+
+    brier = brier_score_loss(
+        y_test, probabilities
+    )
+
+    fold_results.append({
+        "patient": test_patient,
+        "PR_AUC": pr_auc,
+        "ROC_AUC": roc_auc,
+        "Brier_Score": brier,
+        "n_test_cells": len(test),
+        "positive_cells": int(y_test.sum())
+    })
+
+    for cell_id, actual, predicted in zip(
+        test["cell_id"],
+        y_test,
+        probabilities
+    ):
+        all_predictions.append({
+            "cell_id": cell_id,
+            "patient": test_patient,
+            "actual_CCL19_detection": actual,
+            "predicted_probability": predicted
+        })
+
+    # Save model coefficients for this fold
+    coefficients = pd.DataFrame({
+        "gene": selected_genes,
+        "coefficient": model.coef_[0]
+    })
+
+    coefficients["patient_tested"] = test_patient
+
+    fold_feature_importance.append(coefficients)
+
+# -----------------------------
+# 6. Save cross-validation results
+# -----------------------------
+
+results_df = pd.DataFrame(fold_results)
+
+results_df.to_csv(
+    OUTPUT_DIR / "LOPO_Performance.csv",
+    index=False
+)
+
+predictions_df = pd.DataFrame(all_predictions)
+
+predictions_df.to_csv(
+    OUTPUT_DIR / "LOPO_Predictions.csv",
+    index=False
+)
+
+if not results_df.empty:
+
+    summary = results_df[
+        ["PR_AUC", "ROC_AUC", "Brier_Score"]
+    ].mean()
+
+    summary.to_csv(
+        OUTPUT_DIR / "Mean_Model_Performance.csv"
+    )
+
+    print("\nMean LOPO performance:")
+    print(summary)
+
+# -----------------------------
+# 7. Aggregate feature stability
+# -----------------------------
+
+if fold_feature_importance:
+
+    coefficients_df = pd.concat(
+        fold_feature_importance,
+        ignore_index=True
+    )
+
+    coefficients_df["abs_coefficient"] = (
+        coefficients_df["coefficient"].abs()
+    )
+
+    feature_summary = (
+        coefficients_df.groupby("gene")
+        .agg(
+            mean_coefficient=("coefficient", "mean"),
+            mean_abs_coefficient=("abs_coefficient", "mean"),
+            folds_present=("patient_tested", "nunique")
+        )
+        .sort_values(
+            "mean_abs_coefficient",
+            ascending=False
+        )
+        .reset_index()
+    )
+
+    feature_summary.to_csv(
+        OUTPUT_DIR / "Feature_Stability.csv",
+        index=False
+    )
+
+# -----------------------------
+# 8. Plot model performance
+# -----------------------------
+
+if not results_df.empty:
+
+    plt.figure(figsize=(9, 5))
+
+    sns.barplot(
+        data=results_df,
+        x="patient",
+        y="PR_AUC"
+    )
+
+    plt.title("CCL19 Detection: LOPO PR-AUC")
+    plt.xlabel("Held-out patient")
+    plt.ylabel("PR-AUC")
+    plt.tight_layout()
+
+    plt.savefig(
+        OUTPUT_DIR / "LOPO_PR_AUC.png",
+        dpi=300
+    )
+
+    plt.close()
+
+# -----------------------------
+# 9. SHAP analysis
+# -----------------------------
+
+try:
+    import shap
+
+    if fold_feature_importance:
+
+        # SHAP is calculated on the final eligible
+        # patient-held-out fold model.
+        # For strict fold-wise interpretation,
+        # repeat SHAP separately inside every fold.
+
+        explainer = shap.LinearExplainer(
+            model,
+            X_train_scaled
+        )
+
+        shap_values = explainer(
+            X_test_scaled
+        )
+
+        shap_importance = pd.DataFrame({
+            "gene": selected_genes,
+            "mean_abs_SHAP": np.abs(
+                shap_values.values
+            ).mean(axis=0)
+        })
+
+        shap_importance = (
+            shap_importance
+            .sort_values(
+                "mean_abs_SHAP",
+                ascending=False
+            )
+        )
+
+        shap_importance.to_csv(
+            OUTPUT_DIR / "SHAP_Feature_Importance.csv",
+            index=False
+        )
+
+        top_features = shap_importance.head(20)
+
+        plt.figure(figsize=(9, 7))
+
+        sns.barplot(
+            data=top_features,
+            x="mean_abs_SHAP",
+            y="gene"
+        )
+
+        plt.title(
+            "Top 20 Features Contributing to CCL19 Detection"
+        )
+
+        plt.xlabel("Mean Absolute SHAP Value")
+        plt.ylabel("Gene")
+        plt.tight_layout()
+
+        plt.savefig(
+            OUTPUT_DIR / "SHAP_Top20_Features.png",
+            dpi=300
+        )
+
+        plt.close()
+
+except ImportError:
+    print(
+        "SHAP is not installed. "
+        "Install it using: pip install shap"
+    )
+
+print("\nCCL19 analysis completed.")
+print("Results saved to:", OUTPUT_DIR)
+
